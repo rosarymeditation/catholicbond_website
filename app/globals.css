@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #060B18;
+  --surface: #0A1628;
+  --card: #0D1B33;
+  --border: #1A3A6A;
+  --primary: #1565C0;
+  --primary-soft: #1976D2;
+  --primary-dark: #0D47A1;
+  --white: #EEF4FF;
+  --soft-blue: #BBCEF0;
+  --dim: #7A96C4;
+  --text: #CDD6F0;
+  --green: #4CAF82;
+  --amber: #FFCA28;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+/* Paint background immediately — prevents white flash before JS hydrates */
+html, body {
+  background-color: #060B18;
+  color: #CDD6F0;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Prevent layout shift from icon font loading */
+.bi { display: inline-block; width: 1em; height: 1em; }
+
