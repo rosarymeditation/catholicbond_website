@@ -14,12 +14,7 @@ import { useState, type CSSProperties } from "react";
 
 type Props = {
     token: string;
-    member: {
-        firstname: string;
-        photo: string | null;
-        city: string;
-        country: string;
-    };
+    member: { firstname: string; photo: string | null; city: string; country: string };
     parish: { name: string; city: string; country: string };
     expiresAt: string;
     roles: string[];
@@ -68,9 +63,7 @@ export default function ParishVerifyForm({
         setError("");
 
         if (kind === "yes" && (!name.trim() || !role || !authorised)) {
-            setError(
-                "Please add your name and role, and confirm you're authorised to answer for the parish.",
-            );
+            setError("Please add your name and role, and confirm you're authorised to answer for the parish.");
             return;
         }
 
@@ -83,28 +76,24 @@ export default function ParishVerifyForm({
                     kind === "optout"
                         ? { action: "optout", token }
                         : {
-                              action: "respond",
-                              token,
-                              answer: kind,
-                              responderName: name.trim(),
-                              responderRole: role,
-                              authorised,
-                          },
+                            action: "respond",
+                            token,
+                            answer: kind,
+                            responderName: name.trim(),
+                            responderRole: role,
+                            authorised,
+                        }
                 ),
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setError(
-                    data?.message || "Something went wrong. Please try again.",
-                );
+                setError(data?.message || "Something went wrong. Please try again.");
                 return;
             }
             setDone(kind);
             setStep("done");
         } catch {
-            setError(
-                "Couldn't reach our server. Please check your connection and try again.",
-            );
+            setError("Couldn't reach our server. Please check your connection and try again.");
         } finally {
             setBusy("");
         }
@@ -134,10 +123,7 @@ export default function ParishVerifyForm({
         }[done];
         return (
             <div style={{ textAlign: "center", padding: "12px 4px" }}>
-                <i
-                    className={`bi ${msg.icon}`}
-                    style={{ fontSize: 42, color: msg.color }}
-                />
+                <i className={`bi ${msg.icon}`} style={{ fontSize: 42, color: msg.color }} />
                 <h1 style={{ ...s.h1, marginTop: 14 }}>{msg.title}</h1>
                 <p style={s.text}>{msg.text}</p>
             </div>
@@ -150,23 +136,14 @@ export default function ParishVerifyForm({
             <div>
                 <h1 style={s.h1}>Stop verification requests?</h1>
                 <p style={{ ...s.text, marginBottom: 20 }}>
-                    We won't send any more parishioner confirmation requests to
-                    this email address, and the current request from{" "}
-                    {member.firstname} will be closed.
+                    We won't send any more parishioner confirmation requests to this email address, and the
+                    current request from {member.firstname} will be closed.
                 </p>
                 {error && <p style={s.error}>{error}</p>}
-                <button
-                    style={{ ...s.btn, ...s.btnDanger }}
-                    disabled={!!busy}
-                    onClick={() => send("optout")}
-                >
+                <button style={{ ...s.btn, ...s.btnDanger }} disabled={!!busy} onClick={() => send("optout")}>
                     {busy === "optout" ? <Spinner /> : "Yes, stop requests"}
                 </button>
-                <button
-                    style={{ ...s.btn, ...s.btnGhost }}
-                    disabled={!!busy}
-                    onClick={() => setStep("ask")}
-                >
+                <button style={{ ...s.btn, ...s.btnGhost }} disabled={!!busy} onClick={() => setStep("ask")}>
                     Go back to the request
                 </button>
             </div>
@@ -177,14 +154,14 @@ export default function ParishVerifyForm({
     return (
         <div>
             <div style={s.eyebrow}>
-                <span style={s.bar} /> PARISH CONFIRMATION
+                <span style={s.bar} /> A REQUEST FROM ONE OF YOUR PARISHIONERS
             </div>
             <h1 style={s.h1}>
                 Does {member.firstname} worship at {parish.name}?
             </h1>
             <p style={{ ...s.text, marginBottom: 20 }}>
-                {member.firstname} asked CatholicBond to confirm with you that
-                they are part of your parish community. They gave their
+                {member.firstname} is a member of CatholicBond, a community for Catholic adults seeking
+                marriage. They asked us to check with you that they're part of your parish, and gave their
                 permission for us to contact you.
             </p>
 
@@ -192,26 +169,10 @@ export default function ParishVerifyForm({
             <div style={s.person}>
                 {member.photo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={member.photo}
-                        alt={member.firstname}
-                        width={84}
-                        height={84}
-                        style={s.photo}
-                    />
+                    <img src={member.photo} alt={member.firstname} width={84} height={84} style={s.photo} />
                 ) : (
-                    <div
-                        style={{
-                            ...s.photo,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <i
-                            className="bi bi-person"
-                            style={{ fontSize: 34, color: "var(--dim)" }}
-                        />
+                    <div style={{ ...s.photo, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <i className="bi bi-person" style={{ fontSize: 34, color: "var(--dim)" }} />
                     </div>
                 )}
                 <div>
@@ -222,24 +183,11 @@ export default function ParishVerifyForm({
 
             {step === "ask" && (
                 <>
-                    <button
-                        style={{ ...s.btn, ...s.btnPrimary }}
-                        disabled={!!busy}
-                        onClick={() => setStep("yes")}
-                    >
-                        <i className="bi bi-check-lg" /> Yes, they worship with
-                        us
+                    <button style={{ ...s.btn, ...s.btnPrimary }} disabled={!!busy} onClick={() => setStep("yes")}>
+                        <i className="bi bi-check-lg" /> Yes, they worship with us
                     </button>
-                    <button
-                        style={{ ...s.btn, ...s.btnGhost }}
-                        disabled={!!busy}
-                        onClick={() => send("no")}
-                    >
-                        {busy === "no" ? (
-                            <Spinner />
-                        ) : (
-                            "No / I don't know this person"
-                        )}
+                    <button style={{ ...s.btn, ...s.btnGhost }} disabled={!!busy} onClick={() => send("no")}>
+                        {busy === "no" ? <Spinner /> : "No / I don't know this person"}
                     </button>
                     {error && <p style={s.error}>{error}</p>}
                 </>
@@ -257,11 +205,7 @@ export default function ParishVerifyForm({
                     />
 
                     <label style={s.label}>Your role</label>
-                    <select
-                        style={s.input}
-                        value={role}
-                        onChange={(e) => setRole(e.target.value)}
-                    >
+                    <select style={s.input} value={role} onChange={(e) => setRole(e.target.value)}>
                         <option value="">Choose your role</option>
                         {roles.map((r) => (
                             <option key={r} value={r}>
@@ -278,34 +222,24 @@ export default function ParishVerifyForm({
                             style={{ marginTop: 3, accentColor: "#1976D2" }}
                         />
                         <span>
-                            I'm authorised by {parish.name} to confirm that{" "}
-                            {member.firstname} worships with us.
+                            I'm authorised by {parish.name} to confirm that {member.firstname} worships with us.
                         </span>
                     </label>
 
                     {error && <p style={s.error}>{error}</p>}
 
-                    <button
-                        style={{ ...s.btn, ...s.btnPrimary }}
-                        disabled={!!busy}
-                        onClick={() => send("yes")}
-                    >
+                    <button style={{ ...s.btn, ...s.btnPrimary }} disabled={!!busy} onClick={() => send("yes")}>
                         {busy === "yes" ? <Spinner /> : "Confirm"}
                     </button>
-                    <button
-                        style={{ ...s.btn, ...s.btnGhost }}
-                        disabled={!!busy}
-                        onClick={() => setStep("ask")}
-                    >
+                    <button style={{ ...s.btn, ...s.btnGhost }} disabled={!!busy} onClick={() => setStep("ask")}>
                         Back
                     </button>
                 </div>
             )}
 
             <p style={s.small}>
-                This request is open until {until}. Your answer is only used to
-                show a “Parish verified” badge on {member.firstname}&apos;s
-                profile.{" "}
+                This request is open until {until}. Your answer is only used to show a “Parish verified”
+                badge on {member.firstname}&apos;s profile.{" "}
                 <button style={s.linkBtn} onClick={() => setStep("optout")}>
                     Don&apos;t contact this parish again
                 </button>
@@ -347,13 +281,7 @@ const s: Record<string, CSSProperties> = {
         marginBottom: 12,
         fontFamily: "Inter, sans-serif",
     },
-    bar: {
-        width: 3,
-        height: 14,
-        background: "var(--primary-soft)",
-        borderRadius: 2,
-        display: "inline-block",
-    },
+    bar: { width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2, display: "inline-block" },
     h1: {
         fontFamily: "'EB Garamond', Georgia, serif",
         fontSize: 26,
@@ -361,13 +289,7 @@ const s: Record<string, CSSProperties> = {
         color: "var(--white)",
         margin: "0 0 10px",
     },
-    text: {
-        fontFamily: "Inter, sans-serif",
-        fontSize: 15,
-        lineHeight: 1.7,
-        color: "var(--dim)",
-        margin: 0,
-    },
+    text: { fontFamily: "Inter, sans-serif", fontSize: 15, lineHeight: 1.7, color: "var(--dim)", margin: 0 },
     person: {
         display: "flex",
         alignItems: "center",
@@ -387,17 +309,8 @@ const s: Record<string, CSSProperties> = {
         flexShrink: 0,
         background: "rgba(21,101,192,0.12)",
     },
-    personName: {
-        fontFamily: "'EB Garamond', Georgia, serif",
-        fontSize: 22,
-        color: "var(--white)",
-    },
-    personPlace: {
-        fontFamily: "Inter, sans-serif",
-        fontSize: 13,
-        color: "var(--dim)",
-        marginTop: 2,
-    },
+    personName: { fontFamily: "'EB Garamond', Georgia, serif", fontSize: 22, color: "var(--white)" },
+    personPlace: { fontFamily: "Inter, sans-serif", fontSize: 13, color: "var(--dim)", marginTop: 2 },
     btn: {
         width: "100%",
         minHeight: 50,
@@ -414,8 +327,7 @@ const s: Record<string, CSSProperties> = {
         border: "none",
     },
     btnPrimary: {
-        background:
-            "linear-gradient(135deg, var(--primary-dark), var(--primary-soft))",
+        background: "linear-gradient(135deg, var(--primary-dark), var(--primary-soft))",
         color: "white",
         boxShadow: "0 6px 20px rgba(21,101,192,0.40)",
     },
