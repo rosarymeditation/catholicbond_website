@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import type { CSSProperties, ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "CatholicBond — Find Love Rooted in Faith",
+  title: "CatholicBond | Catholic dating for marriage",
   description:
-    "CatholicBond connects single Catholics seeking meaningful, Christ-centred relationships. Join a verified community of devout singles building love on a foundation of shared faith.",
+    "CatholicBond is a dating app for single Catholics who want to marry in the faith. Photo-verified profiles, parish verification, and a community that takes faith and marriage seriously.",
   alternates: { canonical: "https://www.catholicbond.com" },
 };
 
+// Structured data for search engines.
+// Ratings are left out on purpose: only add an aggregateRating that matches
+// your real App Store / Google Play rating, or Google may penalise the page.
 const jsonLd = [
   {
     "@context": "https://schema.org",
@@ -17,378 +21,276 @@ const jsonLd = [
     name: "CatholicBond",
     operatingSystem: "iOS, Android",
     applicationCategory: "LifestyleApplication",
-    aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "2400" },
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      { "@type": "Question", name: "Is CatholicBond free?", acceptedAnswer: { "@type": "Answer", text: "Yes. CatholicBond is free to join and explore. Premium membership unlocks unlimited messaging and additional features." } },
-      { "@type": "Question", name: "How is CatholicBond different from CatholicMatch?", acceptedAnswer: { "@type": "Answer", text: "CatholicBond offers photo verification, a faith quiz badge system, mutual matching, and a growing global community — with a free tier that lets you start connecting immediately." } },
-      { "@type": "Question", name: "Is CatholicBond available on iPhone and Android?", acceptedAnswer: { "@type": "Answer", text: "Yes. CatholicBond is available on both iOS App Store and Google Play Store worldwide." } },
-    ],
   },
   {
     "@context": "https://schema.org",
     "@type": "DatingService",
     name: "CatholicBond",
-    description: "A faith-based dating app for Catholic singles seeking serious relationships.",
+    description: "A dating app for single Catholics who want to marry in the faith.",
     url: "https://www.catholicbond.com",
     operatingArea: { "@type": "Country", name: "Worldwide" },
   },
 ];
 
+const FAQS = [
+  { q: "Is CatholicBond free?", a: "Yes. You can join, build your profile, match and message for free. Premium adds unlimited messaging, match requests, parish verification, read receipts and the gold cross badge." },
+  { q: "What is parish verification?", a: "A way for your parish to confirm that you worship there. You give us your parish's details and permission to contact them. We check the details, email the parish office, and if they confirm, a Parish verified badge appears on your profile for 12 months. It's available to Premium members." },
+  { q: "Who answers the parish email?", a: "Usually the parish priest or the parish secretary. They see your first name and photo and simply confirm whether you're part of the parish. They don't need an account, and we never add them to a mailing list." },
+  { q: "Are profiles verified?", a: "Members can verify their photos with a live selfie, which adds a blue badge to their profile. We'd always suggest talking to verified members, and reporting anything that doesn't feel right." },
+  { q: "How do you deal with scammers and fake profiles?", a: "Everyone agrees to our community promise when they join, including never asking for money. Our team reviews every report, and accounts that break the rules are removed." },
+  { q: "Is CatholicBond available in my country?", a: "Yes, it's available worldwide on the App Store and Google Play, including the UK, Ireland, the US, Nigeria and across Latin America." },
+  { q: "How is it different from other Catholic dating sites?", a: "Faith sits at the centre of every profile, and trust is built in: photo verification, parish verification and a promise everyone agrees to. You can also start for free, without a card." },
+];
+
+// FAQ data for search engines, built from the same list shown on the page
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+};
+
+// ── Type & layout ─────────────────────────────────────────────────────────────
+const serif = "'EB Garamond', Georgia, serif";
+const sans = "Inter, sans-serif";
+
+const s = {
+  wrap: { maxWidth: 1080, margin: "0 auto", padding: "0 24px" },
+  narrow: { maxWidth: 720, margin: "0 auto", padding: "0 24px" },
+  h1: { fontFamily: serif, fontWeight: 500, fontSize: "clamp(40px, 6vw, 68px)", lineHeight: 1.04, letterSpacing: "-0.02em", color: "var(--white)", margin: "0 0 24px" },
+  h2: { fontFamily: serif, fontWeight: 500, fontSize: "clamp(32px, 4.2vw, 46px)", lineHeight: 1.1, letterSpacing: "-0.015em", color: "var(--white)", margin: "0 0 20px" },
+  h3: { fontFamily: serif, fontWeight: 500, fontSize: 22, lineHeight: 1.25, color: "var(--white)", margin: "0 0 6px" },
+  body: { fontFamily: sans, fontSize: 16.5, lineHeight: 1.7, color: "var(--text)", margin: "0 0 18px" },
+  small: { fontFamily: sans, fontSize: 14.5, lineHeight: 1.65, color: "var(--dim)", margin: 0 },
+  label: { fontFamily: sans, fontSize: 13, color: "var(--amber)", margin: "0 0 18px" },
+  rule: { border: 0, borderTop: "1px solid rgba(26,58,106,0.55)", margin: 0 },
+} satisfies Record<string, CSSProperties>;
+
+function Section({ id, bg = "var(--bg)", children }: { id: string; bg?: string; children: ReactNode }) {
+  return (
+    <section id={id} className="sec" style={{ padding: "112px 0", background: bg }}>
+      {children}
+    </section>
+  );
+}
+
+function StoreButtons() {
+  return (
+    <div className="store" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <a href="/go" style={{ background: "var(--white)", color: "#0A1628", padding: "13px 22px", borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, fontFamily: sans }}>
+        <i className="bi bi-apple" /> App Store
+      </a>
+      <a href="/go" style={{ color: "var(--white)", padding: "13px 22px", borderRadius: 10, fontSize: 15, fontWeight: 600, border: "1px solid rgba(238,244,255,0.25)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, fontFamily: sans }}>
+        <i className="bi bi-google-play" /> Google Play
+      </a>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
-      {jsonLd.map((schema, i) => (
+      {[...jsonLd, faqLd].map((schema, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
 
       <Header />
 
       {/* ── HERO ── */}
-      <section id="hero" style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "120px 0 80px", position: "relative", overflow: "hidden", background: "var(--bg)" }}>
-        <div style={{ position: "absolute", top: -200, right: -200, width: 700, height: 700, background: "radial-gradient(circle, rgba(21,101,192,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -100, left: -100, width: 500, height: 500, background: "radial-gradient(circle, rgba(21,101,192,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
-
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px", width: "100%" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }} className="hero-grid">
-
+      <section id="hero" style={{ padding: "150px 0 96px", background: "var(--bg)" }}>
+        <div style={s.wrap}>
+          <div className="two" style={{ display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 64, alignItems: "center" }}>
             <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(21,101,192,0.12)", border: "1px solid rgba(21,101,192,0.30)", borderRadius: 100, padding: "6px 16px", fontSize: 13, color: "var(--soft-blue)", fontWeight: 500, marginBottom: 28 }}>
-                <span style={{ width: 6, height: 6, background: "var(--green)", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
-                Faith-Centred Dating — Now Available Worldwide
-              </div>
-
-              <h1 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(36px, 5vw, 58px)", lineHeight: 1.15, fontWeight: 700, color: "var(--white)", marginBottom: 20 }}>
-                Find Love Built on{" "}
-                <br />
-                <span style={{ background: "linear-gradient(135deg, var(--primary-soft), var(--soft-blue))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  Faith, Trust
-                </span>
-                <br />
-                and Shared Values
-              </h1>
-
-              <p style={{ fontSize: 16, color: "var(--dim)", maxWidth: 480, lineHeight: 1.8, marginBottom: 36, fontFamily: "Inter, sans-serif" }}>
-                CatholicBond connects devout Catholics seeking meaningful relationships grounded in Christ. Verified profiles, intentional conversations, and a community that understands what you are truly looking for.
+              <p style={s.label}>For Catholics discerning marriage</p>
+              <h1 style={s.h1}>Meet someone who shares your faith, and your future.</h1>
+              <p style={{ ...s.body, fontSize: 18, maxWidth: 520, color: "var(--dim)", marginBottom: 32 }}>
+                CatholicBond is a dating app for single Catholics who hope to marry in the Church. Profiles are built around faith, members can verify their photos, and your parish can even confirm you worship there.
               </p>
-
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                <a href="/go" style={{ background: "linear-gradient(135deg, var(--primary-dark), var(--primary-soft))", color: "white", padding: "14px 28px", borderRadius: 14, fontSize: 15, fontWeight: 600, textDecoration: "none", boxShadow: "0 6px 20px rgba(21,101,192,0.40)", display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  <i className="bi bi-apple" /> Download on App Store
-                </a>
-                <a href="/go" style={{ background: "transparent", color: "var(--soft-blue)", padding: "14px 28px", borderRadius: 14, fontSize: 15, fontWeight: 600, border: "1px solid rgba(26,58,106,0.80)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  <i className="bi bi-google-play" /> Get on Google Play
-                </a>
-              </div>
+              <StoreButtons />
+              <p style={{ ...s.small, fontSize: 13.5, marginTop: 18 }}>Free to join · iPhone and Android · Worldwide</p>
             </div>
 
-            <div className="hero-image" style={{ display: "flex", justifyContent: "center", position: "relative", minHeight: 300 }}>
-              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 420, height: 420, borderRadius: "50%", background: "radial-gradient(circle, rgba(21,101,192,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div className="hero-image" style={{ display: "flex", justifyContent: "center" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/img/app.png" alt="CatholicBond dating app showing Catholic singles profiles on iPhone" width={340} height={680} style={{ maxWidth: 340, width: "100%", height: "auto", filter: "drop-shadow(0 30px 60px rgba(21,101,192,0.30))", borderRadius: 28 }} fetchPriority="high" />
+              <img src="/assets/img/app.png" alt="CatholicBond app showing a Catholic member's profile on iPhone" width={320} height={640} style={{ maxWidth: 320, width: "100%", height: "auto", borderRadius: 28 }} fetchPriority="high" />
             </div>
-          </div>
-
-          {/* Stats */}
-          <div style={{ marginTop: 64, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }} className="stats-grid">
-            {[
-              { icon: "bi-people-fill", title: "120k+ Members", desc: "Faithful Catholics worldwide" },
-              { icon: "bi-heart-fill", title: "10k+ Matches", desc: "Meaningful connections made" },
-              { icon: "bi-chat-dots-fill", title: "500k+ Messages", desc: "Faith-centred conversations" },
-              { icon: "bi-star-fill", title: "Rated 4.9 / 5", desc: "Loved by Catholic singles" },
-            ].map(({ icon, title, desc }) => (
-              <div key={title} style={{ background: "rgba(13,27,51,0.95)", border: "1px solid rgba(26,58,106,0.50)", borderRadius: 16, padding: 20, display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 44, height: 44, background: "rgba(21,101,192,0.15)", border: "1px solid rgba(21,101,192,0.25)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 18, color: "var(--primary-soft)" }}>
-                  <i className={`bi ${icon}`} />
-                </div>
-                <div>
-                  <h4 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: 16, color: "var(--white)", marginBottom: 2 }}>{title}</h4>
-                  <p style={{ fontSize: 12, color: "var(--dim)", margin: 0, fontFamily: "Inter, sans-serif" }}>{desc}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* ── ABOUT ── */}
-      <section id="about" style={{ padding: "100px 0", background: "var(--surface)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }} className="hero-grid">
-            <div style={{ position: "relative" }}>
-              <Image src="/assets/img/catholic_couple.png" alt="Catholic couple who met on CatholicBond faith-based dating app" width={600} height={520} style={{ width: "100%", borderRadius: 24, objectFit: "cover", maxHeight: 520, border: "1px solid rgba(26,58,106,0.40)" }} loading="lazy" />
-              <div style={{ position: "absolute", bottom: -20, left: -20, background: "var(--card)", border: "1px solid rgba(26,58,106,0.60)", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 10px 30px rgba(0,0,0,0.30)" }}>
-                <div style={{ width: 40, height: 40, background: "rgba(76,175,130,0.15)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--green)", fontSize: 18 }}>
-                  <i className="bi bi-shield-check" />
-                </div>
-                <div>
-                  <h5 style={{ fontSize: 15, color: "var(--white)", marginBottom: 2, fontFamily: "'EB Garamond', Georgia, serif" }}>Verified Community</h5>
-                  <p style={{ fontSize: 12, color: "var(--dim)", margin: 0, fontFamily: "Inter, sans-serif" }}>Every member photo-verified</p>
-                </div>
-              </div>
-            </div>
+      <Section id="about" bg="var(--surface)">
+        <div style={s.wrap}>
+          <div className="two" style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: 72, alignItems: "center" }}>
+            <Image src="/assets/img/catholic_couple.png" alt="A Catholic couple" width={600} height={520} style={{ width: "100%", height: "auto", borderRadius: 14, objectFit: "cover", maxHeight: 560 }} loading="lazy" />
 
             <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", color: "var(--dim)", textTransform: "uppercase", marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-                <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-                ABOUT CATHOLICBOND
-              </div>
-              <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.2, color: "var(--white)", marginBottom: 16 }}>
-                Faith-First Dating for<br />Devoted Catholics
-              </h2>
-              <p style={{ fontSize: 15, color: "var(--dim)", lineHeight: 1.8, maxWidth: 540, marginBottom: 28, fontFamily: "Inter, sans-serif" }}>
-                CatholicBond is built for those who believe love grows strongest when rooted in shared faith. We created a space where Catholics can pursue genuine connection — without compromise, without rush, and without noise.
+              <h2 style={s.h2}>Faith isn&apos;t a box to tick here. It&apos;s where things start.</h2>
+              <p style={s.body}>
+                On most apps, religion is one line on a long profile. On CatholicBond you can see whether someone goes to Mass, how they pray and what they hope for in family life before you ever say hello.
               </p>
-              <ul style={{ listStyle: "none", padding: 0 }}>
+              <p style={{ ...s.body, color: "var(--dim)" }}>
+                We keep things calm and intentional. Everyone agrees to a short community promise when they join, and our team acts quickly on fake profiles, scams and anyone who doesn&apos;t treat others with respect.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── PARISH VERIFICATION ── */}
+      <Section id="parish-verification">
+        <div style={s.wrap}>
+          <div style={{ maxWidth: 720 }}>
+            <div>
+              <p style={s.label}>New for Premium members</p>
+              <h2 style={s.h2}>Let your parish vouch for you.</h2>
+              <p style={{ ...s.body, marginBottom: 36 }}>
+                Anyone can write &ldquo;practising Catholic&rdquo; on a profile. Parish verification lets your parish confirm it, and adds a <span style={{ color: "var(--amber)" }}>Parish verified</span> badge to your profile so the people you meet know your faith is lived, not just listed.
+              </p>
+
+              <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {[
-                  "Profiles built around Catholic values and faith journey",
-                  "Photo-verified members for a safer, more authentic community",
-                  "Intentional messaging designed to encourage real conversation",
-                  "Faith quiz badges to signal your commitment and values",
-                  "Free to join — start discovering matches today",
-                ].map((item) => (
-                  <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(26,58,106,0.25)", fontSize: 14, color: "var(--text)", fontFamily: "Inter, sans-serif" }}>
-                    <div style={{ width: 20, height: 20, background: "rgba(76,175,130,0.15)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--green)", fontSize: 11, flexShrink: 0, marginTop: 1 }}>
-                      <i className="bi bi-check" />
+                  ["Tell us your parish", "Your parish name, town, and the parish office email from its website. You give us permission to contact them."],
+                  ["We check, then ask them", "Our team looks over the details first, then sends the parish office a short, private email with your first name and photo."],
+                  ["Your parish answers", "The priest or parish secretary confirms with one tap. If they say yes, your badge goes live for 12 months."],
+                ].map(([title, desc], i) => (
+                  <li key={title} style={{ display: "grid", gridTemplateColumns: "44px 1fr", gap: 8, padding: "20px 0", borderTop: "1px solid rgba(26,58,106,0.55)" }}>
+                    <span style={{ fontFamily: serif, fontSize: 22, color: "var(--amber)", lineHeight: 1.2 }}>{i + 1}</span>
+                    <div>
+                      <h3 style={{ ...s.h3, fontSize: 20 }}>{title}</h3>
+                      <p style={s.small}>{desc}</p>
                     </div>
-                    {item}
                   </li>
                 ))}
-              </ul>
+              </ol>
+              <p style={{ ...s.small, fontSize: 13, marginTop: 20 }}>Parishes are never added to mailing lists, and their answer is only used for the badge.</p>
             </div>
+
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* ── FEATURES ── */}
-      <section id="features" style={{ padding: "100px 0", background: "var(--bg)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", color: "var(--dim)", textTransform: "uppercase", marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-              WHY CATHOLICBOND
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-            </div>
-            <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.2, color: "var(--white)", marginBottom: 16 }}>
-              Everything You Need to<br />Connect with Confidence
-            </h2>
-            <p style={{ fontSize: 15, color: "var(--dim)", lineHeight: 1.8, maxWidth: 540, margin: "0 auto", fontFamily: "Inter, sans-serif" }}>
-              Every feature is designed with your faith and your safety in mind.
-            </p>
-          </div>
+      <Section id="features" bg="var(--surface)">
+        <div style={s.wrap}>
+          <h2 style={{ ...s.h2, maxWidth: 640 }}>What&apos;s in the app</h2>
+          <p style={{ ...s.body, color: "var(--dim)", maxWidth: 560, marginBottom: 48 }}>Most of it is there to protect you. The rest is there to help a good conversation start.</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginTop: 56 }} className="features-grid">
+          <div className="cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 64 }}>
             {[
-              { icon: "bi-shield-check", color: "rgba(21,101,192,0.15)", iconColor: "var(--primary-soft)", title: "Photo Verification", desc: "Every member verifies their identity with a selfie. No fake profiles, no catfishing — just real Catholics seeking real connection." },
-              { icon: "bi-heart-fill", color: "rgba(76,175,130,0.15)", iconColor: "var(--green)", title: "Mutual Matching", desc: "When two members like each other a match is created. Matched users can message freely without any daily limits — pure, mutual interest." },
-              { icon: "bi-patch-check-fill", color: "rgba(255,202,40,0.12)", iconColor: "var(--amber)", title: "Faith Quiz Badge", desc: "Pass our Catholic faith quiz to earn a badge displayed on your profile — a visible signal of your knowledge and commitment to the faith." },
-              { icon: "bi-chat-heart-fill", color: "rgba(21,101,192,0.15)", iconColor: "var(--primary-soft)", title: "Intentional Messaging", desc: "Free members send one thoughtful message per day — encouraging quality over quantity. Premium members enjoy unlimited messaging." },
-              { icon: "bi-eye-slash-fill", color: "rgba(76,175,130,0.15)", iconColor: "var(--green)", title: "Profile Snooze", desc: "Need a break? Snooze your profile at any time. You disappear from discovery until you are ready to return — full control, always." },
-              { icon: "bi-star-fill", color: "rgba(255,202,40,0.12)", iconColor: "var(--amber)", title: "Premium Cross Badge", desc: "Upgrade to Premium and earn a gold cross badge on your profile — a signal of serious intent that helps you stand out in the community." },
-            ].map(({ icon, color, iconColor, title, desc }) => (
-              <div key={title} style={{ background: "var(--card)", border: "1px solid rgba(26,58,106,0.50)", borderRadius: 20, padding: "28px 24px", transition: "all 0.25s ease", position: "relative", overflow: "hidden" }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 18, background: color }}>
-                  <i className={`bi ${icon}`} style={{ color: iconColor }} />
-                </div>
-                <h4 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: 17, color: "var(--white)", marginBottom: 10 }}>{title}</h4>
-                <p style={{ fontSize: 13.5, color: "var(--dim)", lineHeight: 1.75, margin: 0, fontFamily: "Inter, sans-serif" }}>{desc}</p>
+              ["Photo verification", "Take a live selfie and we match it to your photos. Verified profiles carry a blue badge."],
+              ["Parish verification", "Premium members can ask their parish to confirm they worship there, shown with a gold badge."],
+              ["Mutual matching", "Show interest in someone. If they feel the same, you match and can talk freely."],
+              ["Match requests", "Premium members can send a direct request with one tap. The other person accepts or declines."],
+              ["One message a day", "Free members get one new message a day, which tends to make each one count. Premium removes the limit."],
+              ["Faith quiz badge", "Take a short quiz on the Catholic faith. Pass it and a badge appears on your profile."],
+              ["Profile snooze", "Hide your profile from discovery whenever you need a break, and come back when you're ready."],
+              ["Report and block", "Our team reviews every report. Fake profiles and scammers are removed."],
+            ].map(([title, desc]) => (
+              <div key={title} style={{ padding: "22px 0", borderTop: "1px solid rgba(26,58,106,0.55)" }}>
+                <h3 style={s.h3}>{title}</h3>
+                <p style={s.small}>{desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" style={{ padding: "100px 0", background: "var(--surface)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", color: "var(--dim)", textTransform: "uppercase", marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-              HOW IT WORKS
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
+      <Section id="how">
+        <div style={s.wrap}>
+          <div className="two" style={{ display: "grid", gridTemplateColumns: "0.8fr 1.2fr", gap: 72 }}>
+            <div>
+              <h2 style={s.h2}>Getting started</h2>
+              <p style={{ ...s.body, color: "var(--dim)" }}>Setting up takes a few minutes. Getting to know someone takes as long as it takes.</p>
             </div>
-            <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.2, color: "var(--white)", marginBottom: 16 }}>
-              Three Steps to Finding<br />Your Faith Partner
-            </h2>
-            <p style={{ fontSize: 15, color: "var(--dim)", lineHeight: 1.8, maxWidth: 540, margin: "0 auto", fontFamily: "Inter, sans-serif" }}>
-              Getting started takes less than two minutes.
-            </p>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 32, marginTop: 56, position: "relative" }} className="steps-grid">
-            {[
-              { n: "1", title: "Create Your Profile", desc: "Sign up with your email, share your faith journey, interests, and upload your best photos. The more you share, the better your matches." },
-              { n: "2", title: "Verify & Discover", desc: "Complete photo verification to earn your blue badge. Then browse verified Catholic singles filtered by age, location, and values." },
-              { n: "3", title: "Connect & Grow", desc: "Like profiles, create mutual matches, and start meaningful conversations. Let faith guide every step toward something truly special." },
-            ].map(({ n, title, desc }) => (
-              <div key={n} style={{ textAlign: "center", padding: "0 16px" }}>
-                <div style={{ width: 64, height: 64, background: "linear-gradient(135deg, var(--primary-dark), var(--primary-soft))", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'EB Garamond', Georgia, serif", fontSize: 22, color: "white", margin: "0 auto 20px", boxShadow: "0 8px 24px rgba(21,101,192,0.40)" }}>
-                  {n}
-                </div>
-                <h4 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: 18, color: "var(--white)", marginBottom: 10 }}>{title}</h4>
-                <p style={{ fontSize: 13.5, color: "var(--dim)", lineHeight: 1.75, fontFamily: "Inter, sans-serif" }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" style={{ padding: "100px 0", background: "var(--bg)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", color: "var(--dim)", textTransform: "uppercase", marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-              STORIES OF FAITH
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-            </div>
-            <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.2, color: "var(--white)" }}>Real Connections,<br />Real Stories</h2>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }} className="features-grid">
-            {[
-              { quote: "I had almost given up on finding someone who truly shared my faith. CatholicBond changed everything. We met, talked for weeks, and now we attend Mass together every Sunday.", name: "Isabella M.", location: "São Paulo, Brazil", initial: "I" },
-              { quote: "The photo verification gave me so much confidence. I knew every person I spoke to was real. I met my fiancée here six months ago and we are getting married in the Church.", name: "Michael T.", location: "Chicago, USA", initial: "M" },
-              { quote: "What I love most is the intentionality. The men here take their time and write thoughtfully. It felt completely different from every other dating app I have tried.", name: "Sofía R.", location: "Guadalajara, Mexico", initial: "S" },
-              { quote: "I was sceptical about Catholic dating apps but CatholicBond is genuinely different. The faith quiz badge helped me find someone who lives their faith, not just claims it.", name: "Lucas F.", location: "Rio de Janeiro, Brazil", initial: "L" },
-              { quote: "As a Catholic in a big city it felt impossible to meet someone serious. Within two months on CatholicBond I met the woman I am going to marry. God is good.", name: "Daniel G.", location: "Los Angeles, USA", initial: "D" },
-              { quote: "Me encantó que todos los perfiles están verificados. Conocí a mi novio aquí y compartimos la misma devoción a la Virgen de Guadalupe. Es una bendición.", name: "Valentina C.", location: "Mexico City, Mexico", initial: "V" },
-            ].map(({ quote, name, location, initial }) => (
-              <div key={name} style={{ background: "var(--card)", border: "1px solid rgba(26,58,106,0.50)", borderRadius: 20, padding: "28px 24px" }}>
-                <div style={{ color: "var(--amber)", fontSize: 13, marginBottom: 14, letterSpacing: 2 }}>★★★★★</div>
-                <p style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.8, fontStyle: "italic", marginBottom: 20, fontFamily: "Inter, sans-serif" }}>&ldquo;{quote}&rdquo;</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 42, height: 42, borderRadius: "50%", background: "linear-gradient(135deg, var(--primary-dark), var(--primary-soft))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'EB Garamond', Georgia, serif", fontSize: 16, color: "white", flexShrink: 0 }}>
-                    {initial}
-                  </div>
+            <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              {[
+                ["Create your profile", "Sign up with your email, Google or Apple. Add photos and answer a few questions about your faith, your values and what you're looking for."],
+                ["Get verified", "Verify your photos with a quick selfie. On Premium, you can also ask your parish to confirm you."],
+                ["Meet and talk", "Browse Catholic singles by age, location and values. When interest is mutual, say hello and see where it leads."],
+              ].map(([title, desc], i) => (
+                <li key={title} style={{ display: "grid", gridTemplateColumns: "56px 1fr", padding: "24px 0", borderTop: "1px solid rgba(26,58,106,0.55)" }}>
+                  <span style={{ fontFamily: serif, fontSize: 34, lineHeight: 1, color: "var(--dim)" }}>{i + 1}</span>
                   <div>
-                    <h5 style={{ fontSize: 14, color: "var(--white)", marginBottom: 2, fontFamily: "'EB Garamond', Georgia, serif" }}>{name}</h5>
-                    <p style={{ fontSize: 11, color: "var(--dim)", margin: 0, fontFamily: "Inter, sans-serif" }}>{location}</p>
+                    <h3 style={s.h3}>{title}</h3>
+                    <p style={s.small}>{desc}</p>
                   </div>
-                </div>
-              </div>
-            ))}
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
-      </section>
+      </Section>
+
+      {/* ── COMMUNITY PROMISE ── */}
+      <Section id="community" bg="var(--surface)">
+        <div style={s.narrow}>
+          <h2 style={s.h2}>The promise everyone makes</h2>
+          <p style={{ ...s.body, color: "var(--dim)", marginBottom: 36 }}>
+            Before anyone joins, they agree to four things. It&apos;s short, and we take it seriously.
+          </p>
+          {[
+            ["Be honest.", "Real photos, true details, real intentions."],
+            ["Treat others with dignity.", "Kindness and respect, even when it isn't a match."],
+            ["Keep it chaste and kind.", "Conversations worthy of the person you hope to marry."],
+            ["Never ask for money.", "Asking for money or gifts means a permanent ban."],
+          ].map(([title, desc]) => (
+            <p key={title} style={{ fontFamily: serif, fontSize: 24, lineHeight: 1.4, color: "var(--white)", margin: 0, padding: "18px 0", borderTop: "1px solid rgba(26,58,106,0.55)" }}>
+              {title} <span style={{ color: "var(--dim)" }}>{desc}</span>
+            </p>
+          ))}
+        </div>
+      </Section>
 
       {/* ── FAQ ── */}
-      <section id="faq" style={{ padding: "100px 0", background: "var(--surface)" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", color: "var(--dim)", textTransform: "uppercase", marginBottom: 14, fontFamily: "Inter, sans-serif" }}>
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-              FAQ
-              <div style={{ width: 3, height: 14, background: "var(--primary-soft)", borderRadius: 2 }} />
-            </div>
-            <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", lineHeight: 1.2, color: "var(--white)" }}>Frequently Asked<br />Questions</h2>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {[
-              { q: "Is CatholicBond better than CatholicMatch?", a: "CatholicBond offers photo verification on every profile, a Catholic faith quiz badge, mutual matching, and a free tier with no credit card required — making it more accessible and more trustworthy than traditional Catholic dating sites." },
-              { q: "How much does CatholicBond cost?", a: "CatholicBond is free to download and join. Premium membership unlocks unlimited messaging, read receipts, and a verified cross badge." },
-              { q: "Is CatholicBond available on iPhone and Android?", a: "Yes. CatholicBond is available on both the iOS App Store and Google Play Store, worldwide." },
-              { q: "Are profiles on CatholicBond verified?", a: "Yes. Every member completes a photo verification step using a real-time selfie. This eliminates fake profiles and ensures every person you connect with is genuine." },
-              { q: "Is CatholicBond available in Nigeria?", a: "Yes. CatholicBond has a large and growing community of Nigerian Catholic singles. We have dedicated support for users in Lagos, Abuja, Port Harcourt, and across Nigeria." },
-            ].map(({ q, a }) => (
-              <div key={q} itemScope itemProp="mainEntity" itemType="https://schema.org/Question" style={{ background: "var(--card)", border: "1px solid rgba(26,58,106,0.50)", borderRadius: 16, padding: "24px 28px" }}>
-                <h3 itemProp="name" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: 17, color: "var(--white)", marginBottom: 10 }}>{q}</h3>
-                <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                  <p itemProp="text" style={{ fontSize: 14, color: "var(--dim)", lineHeight: 1.8, margin: 0, fontFamily: "Inter, sans-serif" }}>{a}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      <Section id="faq">
+        <div style={s.narrow}>
+          <h2 style={{ ...s.h2, marginBottom: 32 }}>Questions</h2>
+          {FAQS.map(({ q, a }) => (
+            <details key={q} className="faq" style={{ borderTop: "1px solid rgba(26,58,106,0.55)" }}>
+              <summary style={{ listStyle: "none", cursor: "pointer", padding: "20px 0", display: "flex", justifyContent: "space-between", gap: 16, fontFamily: sans, fontSize: 17, fontWeight: 500, color: "var(--white)" }}>
+                {q}
+                <i className="bi bi-plus-lg" style={{ color: "var(--dim)", flexShrink: 0 }} />
+              </summary>
+              <p style={{ ...s.small, fontSize: 15.5, paddingBottom: 22, maxWidth: 620 }}>{a}</p>
+            </details>
+          ))}
+          <hr style={s.rule} />
         </div>
-      </section>
+      </Section>
 
       {/* ── CTA ── */}
-      <section id="cta" style={{ padding: "100px 0", background: "var(--surface)", textAlign: "center" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ background: "linear-gradient(135deg, rgba(13,71,161,0.25), rgba(25,118,210,0.12))", border: "1px solid rgba(21,101,192,0.30)", borderRadius: 28, padding: "72px 40px", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: -150, left: "50%", transform: "translateX(-50%)", width: 500, height: 500, background: "radial-gradient(circle, rgba(21,101,192,0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
-            <h2 style={{ fontFamily: "'EB Garamond', Georgia, serif", fontSize: "clamp(28px,4vw,42px)", color: "var(--white)", marginBottom: 16 }}>
-              Your Faithful Partner<br />Is Already Here
-            </h2>
-            <p style={{ fontSize: 16, color: "var(--dim)", maxWidth: 500, margin: "0 auto 36px", lineHeight: 1.8, fontFamily: "Inter, sans-serif" }}>
-              Join over 120,000 Catholics who chose intentional love over endless swiping. Download CatholicBond today.
-            </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-              {[["bi-apple", "Download on the", "App Store"], ["bi-google-play", "Get it on", "Google Play"]].map(([icon, small, strong]) => (
-                <a key={strong} href="/go" style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "rgba(13,27,51,0.80)", border: "1px solid rgba(26,58,106,0.70)", borderRadius: 14, padding: "12px 22px", color: "var(--white)", textDecoration: "none", minWidth: 160 }}>
-                  <i className={`bi ${icon}`} style={{ fontSize: 24, color: "var(--soft-blue)" }} />
-                  <div>
-                    <small style={{ display: "block", fontSize: 11, color: "var(--dim)", lineHeight: 1, marginBottom: 2, fontFamily: "Inter, sans-serif" }}>{small}</small>
-                    <strong style={{ fontSize: 15, fontFamily: "'EB Garamond', Georgia, serif" }}>{strong}</strong>
-                  </div>
-                </a>
-              ))}
+      <Section id="cta" bg="var(--surface)">
+        <div style={s.wrap}>
+          <div className="two" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 40, alignItems: "end" }}>
+            <div>
+              <h2 style={{ ...s.h2, marginBottom: 12 }}>Someone is looking for a person like you.</h2>
+              <p style={{ ...s.body, color: "var(--dim)", margin: 0 }}>Download CatholicBond and meet Catholics who want what you want.</p>
             </div>
+            <StoreButtons />
           </div>
         </div>
-      </section>
+      </Section>
 
       <Footer />
 
-      {/* Responsive + animations */}
       <style>{`
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
         body { font-family: 'Inter', sans-serif; }
+        .faq summary::-webkit-details-marker { display: none; }
+        .faq[open] summary i { transform: rotate(45deg); }
+        .faq summary i { transition: transform .2s ease; }
 
-        /* Tablet */
-        @media(max-width:991px){
-          .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
-          .hero-grid > div:last-child { order: -1; }
-          .hero-grid p { margin-left: auto; margin-right: auto; }
-          .hero-grid .hero-buttons { justify-content: center; }
-          .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
-          .features-grid { grid-template-columns: repeat(2,1fr) !important; }
-          .steps-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 900px) {
+          .two { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .cols { grid-template-columns: 1fr !important; }
+          #hero { padding: 120px 0 72px !important; }
+          .hero-image { order: -1; }
+          .hero-image img { max-width: 240px !important; }
         }
-
-        /* Mobile */
-        @media(max-width:575px){
-          /* Layout */
-          .stats-grid { grid-template-columns: 1fr !important; }
-          .features-grid { grid-template-columns: 1fr !important; }
-
-          /* Hero section */
-          #hero { padding: 100px 0 60px !important; }
-          .hero-badge { font-size: 11px !important; padding: 5px 12px !important; }
-          .hero-buttons { flex-direction: column !important; align-items: center !important; gap: 10px !important; }
-          .hero-buttons a { width: 100% !important; max-width: 300px !important; justify-content: center !important; }
-
-          /* Hero image — smaller on mobile */
-          .hero-image { min-height: 240px !important; }
-          .hero-image img { max-width: 200px !important; }
-
-          /* Sections padding */
-          section { padding: 60px 0 !important; }
-
-          /* CTA box */
-          .cta-inner { padding: 40px 20px !important; }
-
-          /* App download buttons */
-          .app-buttons { flex-direction: column !important; align-items: center !important; }
-          .app-buttons a { width: 100% !important; max-width: 260px !important; }
-
-          /* FAQ cards */
-          .faq-card { padding: 18px 16px !important; }
-
-          /* Testimonial grid */
-          .testimonials-grid { grid-template-columns: 1fr !important; }
-
-          /* Steps */
-          .steps-grid { gap: 40px !important; }
-
-          /* Feature cards */
-          .feature-card { padding: 20px 18px !important; }
+        @media (max-width: 575px) {
+          .sec { padding: 72px 0 !important; }
+          .store a { flex: 1 1 auto; justify-content: center; }
         }
       `}</style>
     </>
